@@ -3,9 +3,78 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 <BaseLayout title="About · Lustre">
 	<div class="card-base" style="padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.8;">
-		<h1 style="margin-top: 0;">About</h1>
-		<p>这里是关于我的介绍页面。</p>
-		<p>你可以在这里添加个人简介、技能、联系方式等信息。</p>
+		<!-- 头像区域 - 居中显示 -->
+		<div class="about-avatar-container">
+			<img src="/portrait.jpg" alt="Lustre" class="about-avatar" />
+		</div>
+		
+		<!-- 内容区域 -->
+		<div class="about-content">
+			<h1 style="margin-top: 0; text-align: center;">About</h1>
+			<div class="contact-info">
+				<p><strong>QQ邮箱：</strong><a href="mailto:2534424405@qq.com">2534424405@qq.com</a></p>
+				<p><strong>Google：</strong><a href="mailto:luster2534@gmail.com">luster2534@gmail.com</a></p>
+				<p><strong>大学地址：</strong>广东广州 华南理工大学</p>
+			</div>
+		</div>
 	</div>
 </BaseLayout>
+
+<style>
+	.about-avatar-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+
+	.about-avatar {
+		width: 400px;
+		height: 400px;
+		border-radius: 20px;
+		object-fit: cover;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+		transition: transform 0.3s ease;
+	}
+
+	.about-avatar:hover {
+		transform: scale(1.05);
+	}
+
+	.about-content {
+		text-align: left;
+	}
+
+	.contact-info {
+		margin-top: 1.5rem;
+	}
+
+	.contact-info p {
+		margin: 0.75rem 0;
+		line-height: 1.8;
+	}
+
+	.contact-info a {
+		color: #8dd0ff;
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+
+	.contact-info a:hover {
+		color: #5b9aff;
+		text-decoration: underline;
+	}
+
+	.contact-info strong {
+		color: #f9fafb;
+		margin-right: 0.5rem;
+	}
+
+	@media (max-width: 768px) {
+		.about-avatar {
+			width: 300px;
+			height: 300px;
+		}
+	}
+</style>
 
