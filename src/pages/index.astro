@@ -1,346 +1,77 @@
 ---
+import MainContent from "../components/MainContent.astro";
+import Profile from "../components/Profile.astro";
+import Statistics from "../components/Statistics.astro";
+import Tags from "../components/Tags.astro";
+import PostCard from "../components/PostCard.astro";
 
+const posts = await Astro.glob("./posts/*.md");
+
+const latestPosts = posts
+	.map((post) => ({
+		title: post.frontmatter?.title ?? "未命名文章",
+		description: post.frontmatter?.description ?? "",
+		date: post.frontmatter?.pubDate ? new Date(post.frontmatter.pubDate) : null,
+		url: post.url || "#",
+		tags: (post.frontmatter?.tags as string[]) || [],
+	}))
+	.filter((post) => post.url !== "#")
+	.sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
 ---
-
 <html lang="zh-cn">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Lustre 的多媒体空间</title>
-		<style>
-			:root {
-				font-family:
-					"Segoe UI",
-					system-ui,
-					-apple-system,
-					sans-serif;
-				color: #f9fafb;
-				background-color: #05060a;
-			}
-
-			body {
-				margin: 0;
-				padding: 0 1.5rem 4rem;
-				min-height: 100vh;
-				/* 默认暗色渐变背景 */
-				background: radial-gradient(circle at top, #101b3a, #05060a 60%),
-					#05060a;
-				/* 如果你想用自己的图片，取消下面一行注释并替换成自己的路径：
-				   1. 把图片放到 public 目录，比如 public/bg.jpg
-				   2. 把 url('/bg.jpg') 改成对应文件名
-				   3. 或者用 src/assets 的图片配合 <Image> 组件（进阶）
-				*/
-				/* background-image: url("/bg.jpg"); */
-				background-size: cover;
-				background-position: center;
-				background-repeat: no-repeat;
-			}
-
-			.page {
-				max-width: 1100px;
-				margin: 0 auto;
-			}
-
-			nav {
-				display: flex;
-				gap: 1rem;
-				padding: 1.5rem 0;
-			}
-
-			nav a {
-				color: #8dd0ff;
-				text-decoration: none;
-				font-weight: 600;
-			}
-
-			h1,
-			h2,
-			h3 {
-				margin: 0.5rem 0;
-			}
-
-			p {
-				line-height: 1.7;
-			}
-
-			.hero,
-			section.block {
-				margin-top: 2.5rem;
-				padding: 1.5rem;
-				border-radius: 20px;
-				background: rgba(255, 255, 255, 0.04);
-				backdrop-filter: blur(8px);
-				box-shadow: 0 20px 60px rgba(8, 16, 44, 0.6);
-			}
-
-			.grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-				gap: 1rem;
-				margin-top: 1rem;
-			}
-
-			.track-list button {
-				width: 100%;
-				padding: 0.75rem 1rem;
-				border-radius: 12px;
-				border: 1px solid rgba(255, 255, 255, 0.1);
-				background: rgba(255, 255, 255, 0.04);
-				color: #f9fafb;
-				font-size: 1rem;
-				text-align: left;
-				cursor: pointer;
-				transition:
-					border-color 0.2s ease,
-					transform 0.2s ease;
-			}
-
-			.track-list button.active {
-				border-color: #5b9aff;
-				transform: translateY(-2px);
-			}
-
-			.video-wall iframe {
-				width: 100%;
-				aspect-ratio: 16 / 9;
-				border-radius: 16px;
-				border: 0;
-				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-			}
-
-			.chat-board {
-				display: grid;
-				grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-				gap: 1.5rem;
-			}
-
-			.chat-log {
-				padding: 1rem;
-				border-radius: 16px;
-				background: rgba(0, 0, 0, 0.4);
-				min-height: 220px;
-			}
-
-			.chat-form {
-				display: flex;
-				flex-direction: column;
-				gap: 0.75rem;
-			}
-
-			.chat-form input,
-			.chat-form textarea {
-				width: 100%;
-				padding: 0.75rem 1rem;
-				border-radius: 12px;
-				border: 1px solid rgba(255, 255, 255, 0.12);
-				background: rgba(0, 0, 0, 0.35);
-				color: #f9fafb;
-			}
-
-			.chat-form button {
-				padding: 0.75rem 1rem;
-				border-radius: 12px;
-				border: 0;
-				background: linear-gradient(120deg, #4c8cfd, #8c52ff);
-				color: #fff;
-				font-weight: 600;
-				cursor: pointer;
-			}
-
-			@media (max-width: 768px) {
-				.chat-board {
-					grid-template-columns: 1fr;
-				}
-
-				body {
-					padding: 0 1rem 3rem;
-				}
-			}
-		</style>
+		<title>Lustre · 主页</title>
+		<link rel="stylesheet" href="/src/styles/global.css" />
 	</head>
 	<body>
-		<div class="page">
-			<nav>
-				<a href="/">首页</a>
-				<a href="#about">关于（锚点）</a>
-				<a href="#music">音乐</a>
-				<a href="#video">视频</a>
-				<a href="#collab">协作</a>
-				<a href="/Study/">学习</a>
-			</nav>
-
-			<section class="hero">
-				<h1>Lustre 的私人空间</h1>
-				<h2>欢迎来到暗色多媒体主页</h2>
-				<p>
-					这里是站点的入口页，用来做整体风格展示。 你可以在 <code
-						>about</code
-					> 页里体验音乐、视频、协作模块，这里则作为一个清爽的欢迎页。
-				</p>
-				<p>
-					如果你已经把自己的背景图放到
-					<code>public</code> 目录，记得在上面的 CSS 中把
-					<code>background-image</code> 注释去掉，并改成你的文件名。
-				</p>
-			</section>
-
-			<section id="about" class="block">
-				<h1>关于我</h1>
-				<h2>多媒体太空站 0.1</h2>
-				<p>
-					继续 Astro 旅程的同时，也把这里升级成沉浸式的音乐 + 视频 +
-					协作空间。
-					下面这些模块都是可替换的，可根据日后需要接入后端或第三方服务。
-				</p>
-			</section>
-
-			<section id="music" class="block">
-				<h2>音乐甲板</h2>
-				<p>
-					挑一首歌，稍等几秒即可播放，可用你自己的 CDN/OSS 替换音源。
-				</p>
-				<div class="grid">
-					<div class="track-list">
-						<button
-							data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-						>
-							星空序曲 · SoundHelix
-						</button>
-						<button
-							data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-						>
-							漂浮之海 · SoundHelix
-						</button>
-						<button
-							data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-						>
-							银河漫步 · SoundHelix
-						</button>
-					</div>
-					<div>
-						<p id="now-playing">当前未播放</p>
-						<audio
-							id="player"
-							controls
-							preload="none"
-							style="width: 100%"></audio>
-					</div>
-				</div>
-			</section>
-
-			<section id="video" class="block">
-				<h2>视频墙</h2>
-				<p>
-					预留 3x 视频位，可放频道剪辑、短片或直播，支持替换成
-					Bilibili/腾讯视频 iframe。
-				</p>
-				<div class="grid video-wall">
-					<iframe
-						src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-						title="Video 1"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						allowfullscreen></iframe>
-					<iframe
-						src="https://www.youtube.com/embed/5qap5aO4i9A"
-						title="Video 2"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						allowfullscreen></iframe>
-					<iframe
-						src="https://www.youtube.com/embed/jfKfPfyJRdk"
-						title="Video 3"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						allowfullscreen></iframe>
-				</div>
-			</section>
-
-			<section id="collab" class="block">
-				<h2>协作舱（占位）</h2>
-				<p>
-					这里预留多人聊天/评论模块。可以接入 Supabase
-					Realtime、Ably、Liveblocks 等，实现真实时的协作体验。
-				</p>
-				<div class="chat-board">
-					<div class="chat-log" id="chat-log">
-						<strong>系统</strong>
-						<p>
-							🛰 欢迎来到协作舱，接驳任意 WebSocket/Realtime
-							服务即可开始。
-						</p>
-						<strong>Alice</strong>
-						<p>准备上传下一个视频素材。</p>
-						<strong>Bob</strong>
-						<p>我会负责播单维护，随时在这里留言。</p>
-					</div>
-					<form class="chat-form" id="chat-form">
-						<input
-							type="text"
-							name="nickname"
-							placeholder="昵称"
-							required
-						/>
-						<textarea
-							name="message"
-							rows="3"
-							placeholder="想说的话..."
-							required></textarea>
-						<button type="submit">发送占位消息</button>
-						<small>目前仅做前端占位，提交后会插入本地假消息。</small
-						>
-					</form>
-				</div>
-			</section>
+		<!-- Hero 背景图区域（全屏，带标题） -->
+		<div class="hero-bg">
+			<div class="hero-title">
+				<h1 class="hero-title-main">Lustre's Blog</h1>
+				<p class="hero-title-sub">Welcome to my digital space</p>
+			</div>
+			<div class="scroll-indicator">
+				<span class="scroll-text">Scroll Down</span>
+				<svg class="scroll-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+			</div>
 		</div>
+		
+		<!-- 内容区域（滚动后可见，渐变背景） -->
+		<div class="content-section">
+			<MainContent title="Lustre · 主页">
+				<Fragment slot="sidebar">
+					<Profile />
+					<Statistics />
+					<Tags />
+				</Fragment>
 
-		<script>
-			const player = document.getElementById(
-				"player",
-			) as HTMLAudioElement | null;
-			const nowPlaying = document.getElementById("now-playing");
-			const trackButtons = Array.from(
-				document.querySelectorAll<HTMLButtonElement>(
-					".track-list button",
-				),
-			);
-
-			// Simple playlist binding; replace with your own player SDK if needed.
-			trackButtons.forEach((btn) => {
-				btn.addEventListener("click", () => {
-					if (!player || !nowPlaying) return;
-					trackButtons.forEach((b) => b.classList.remove("active"));
-					btn.classList.add("active");
-					player.src = btn.dataset.src ?? "";
-					player.play().catch(() => {
-						nowPlaying.textContent = "播放失败，请检查音源。";
-					});
-					nowPlaying.textContent = `正在播放：${btn.textContent.trim()}`;
-				});
-			});
-
-			const chatForm = document.getElementById(
-				"chat-form",
-			) as HTMLFormElement | null;
-			const chatLog = document.getElementById("chat-log");
-
-			if (chatForm && chatLog) {
-				chatForm.addEventListener("submit", (event) => {
-					event.preventDefault();
-					const formData = new FormData(chatForm);
-					const nickname = formData.get("nickname");
-					const message = formData.get("message");
-
-					if (!nickname || !message) return;
-
-					// Append pseudo message to visualize UI flow
-					const nameEl = document.createElement("strong");
-					nameEl.textContent = nickname.toString();
-					const msgEl = document.createElement("p");
-					msgEl.textContent = message.toString();
-					chatLog.append(nameEl, msgEl);
-					chatForm.reset();
-				});
-			}
-		</script>
+				<div>
+					<h1 style="font-size: 2rem; margin: 0 0 2rem 0;">最新文章</h1>
+					{latestPosts.length > 0 ? (
+						<div>
+							{latestPosts.map((post) => (
+								<PostCard
+									title={post.title}
+									{...(post.description ? { description: post.description } : {})}
+									{...(post.date ? { date: post.date } : {})}
+									url={post.url}
+									{...(post.tags.length > 0 ? { tags: post.tags } : {})}
+								/>
+							))}
+						</div>
+					) : (
+						<p style="text-align: center; color: rgba(249, 250, 251, 0.6); padding: 3rem;">
+							暂无文章，敬请期待。
+						</p>
+					)}
+				</div>
+			</MainContent>
+		</div>
 	</body>
 </html>

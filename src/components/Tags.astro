@@ -1,0 +1,85 @@
+---
+const posts = await Astro.glob("../pages/posts/*.md");
+
+// 收集所有标签
+const tagMap = new Map<string, number>();
+posts.forEach((post) => {
+	const tags = post.frontmatter?.tags || [];
+	if (Array.isArray(tags)) {
+		tags.forEach((tag: string) => {
+			tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+		});
+	}
+});
+
+const tags = Array.from(tagMap.entries())
+	.map(([name, count]) => ({ name, count }))
+	.sort((a, b) => b.count - a.count);
+---
+<div class="tags-card">
+	<h3 class="tags-title">标签</h3>
+	{tags.length > 0 ? (
+		<div class="tags-list">
+			{tags.map((tag) => (
+				<a href={`/posts?tag=${encodeURIComponent(tag.name)}`} class="tag-item">
+					{tag.name}
+					<span class="tag-count">{tag.count}</span>
+				</a>
+			))}
+		</div>
+	) : (
+		<p class="tags-empty">暂无标签</p>
+	)}
+</div>
+
+<style>
+	.tags-card {
+		border-radius: 20px;
+		background: rgba(255, 255, 255, 0.04);
+		backdrop-filter: blur(10px);
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.tags-title {
+		font-size: 1.1rem;
+		font-weight: 600;
+		margin: 0 0 1rem 0;
+	}
+
+	.tags-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.tag-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0.75rem;
+		border-radius: 999px;
+		background: rgba(91, 154, 255, 0.15);
+		color: #8dd0ff;
+		text-decoration: none;
+		font-size: 0.85rem;
+		transition: all 0.2s;
+	}
+
+	.tag-item:hover {
+		background: rgba(91, 154, 255, 0.25);
+		transform: translateY(-2px);
+	}
+
+	.tag-count {
+		font-size: 0.75rem;
+		color: rgba(249, 250, 251, 0.6);
+	}
+
+	.tags-empty {
+		color: rgba(249, 250, 251, 0.5);
+		font-size: 0.9rem;
+		margin: 0;
+	}
+</style>
+

@@ -1,0 +1,177 @@
+---
+// 站点创建日期（你可以修改为你的站点实际创建日期）
+const SITE_START_DATE = new Date("2024-11-27"); // 修改为你的站点创建日期
+
+const posts = await Astro.glob("../pages/posts/*.md");
+
+const totalPosts = posts.length;
+
+// 计算总字数（简单估算）
+const totalWords = posts.reduce((sum, post) => {
+	const content = post.frontmatter?.description || "";
+	return sum + content.length;
+}, 0);
+
+const formattedWords = totalWords > 1000 ? `${(totalWords / 1000).toFixed(1)}k` : totalWords.toString();
+
+// 计算运营时间（从站点创建日期开始，而不是从最早文章日期）
+const today = new Date();
+const runningDays = Math.floor((today.getTime() - SITE_START_DATE.getTime()) / (1000 * 60 * 60 * 24));
+
+// 将站点创建日期转换为 ISO 字符串，传递给客户端脚本
+const siteStartDateStr = SITE_START_DATE.toISOString();
+
+// 最后更新时间：使用最新文章的日期，如果没有文章则使用当前日期
+let lastUpdated = today.toLocaleDateString("zh-CN", {
+	year: "numeric",
+	month: "2-digit",
+	day: "2-digit",
+});
+
+if (posts.length > 0) {
+	const dates = posts
+		.map((p) => p.frontmatter?.pubDate)
+		.filter(Boolean)
+		.map((d) => new Date(d as string))
+		.filter((d) => !isNaN(d.getTime())); // 过滤无效日期
+	
+	if (dates.length > 0) {
+		const latest = new Date(Math.max(...dates.map((d) => d.getTime())));
+		// 只使用合理的日期（不早于站点创建日期，不晚于今天）
+		if (latest >= SITE_START_DATE && latest <= today) {
+			lastUpdated = latest.toLocaleDateString("zh-CN", {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+			});
+		}
+	}
+}
+---
+<div class="statistics-card">
+	<h3 class="statistics-title">站点信息</h3>
+	<div class="statistics-grid">
+		<div class="stat-item">
+			<div class="stat-label">文章总数</div>
+			<div class="stat-value">{totalPosts} <span class="stat-unit">篇</span></div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-label">总字数</div>
+			<div class="stat-value">{formattedWords}</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-label">运营时间</div>
+			<div class="stat-value" id="running-time-display">
+				{runningDays} <span class="stat-unit">天</span>
+			</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-label">最后更新</div>
+			<div class="stat-value">{lastUpdated}</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.statistics-card {
+		border-radius: 20px;
+		background: rgba(255, 255, 255, 0.04);
+		backdrop-filter: blur(10px);
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.statistics-title {
+		font-size: 1.1rem;
+		font-weight: 600;
+		margin: 0 0 1rem 0;
+	}
+
+	.statistics-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+	}
+
+	.stat-item {
+		text-align: center;
+	}
+
+	.stat-label {
+		font-size: 0.85rem;
+		color: rgba(249, 250, 251, 0.6);
+		margin-bottom: 0.5rem;
+	}
+
+	.stat-value {
+		font-size: 1.25rem;
+		font-weight: bold;
+	}
+
+	.stat-unit {
+		font-size: 0.75rem;
+		font-weight: normal;
+	}
+</style>
+
+<script define:vars={{ siteStartDateStr }}>
+	// 实时更新运营时间的函数
+	function updateRunningTime() {
+		if (!siteStartDateStr) {
+			return;
+		}
+
+		const startDate = new Date(siteStartDateStr);
+		const currentDate = new Date();
+
+		// 计算年、月、日的差值
+		let years = currentDate.getFullYear() - startDate.getFullYear();
+		let months = currentDate.getMonth() - startDate.getMonth();
+		let days = currentDate.getDate() - startDate.getDate();
+
+		// 处理"借位"情况
+		if (days < 0) {
+			months--;
+			const prevMonthLastDay = new Date(
+				currentDate.getFullYear(),
+				currentDate.getMonth(),
+				0,
+			).getDate();
+			days += prevMonthLastDay;
+		}
+		if (months < 0) {
+			years--;
+			months += 12;
+		}
+
+		// 构造显示文本
+		let html = "";
+		if (years > 0) {
+			html += `${years} <span class="stat-unit">年</span> `;
+		}
+		if (months > 0) {
+			html += `${months} <span class="stat-unit">月</span> `;
+		}
+		html += `${days} <span class="stat-unit">天</span>`;
+
+		// 更新页面显示
+		const displayElement = document.getElementById("running-time-display");
+		if (displayElement) {
+			displayElement.innerHTML = html;
+		}
+	}
+
+	// 页面加载时立即更新
+	document.addEventListener("DOMContentLoaded", updateRunningTime);
+
+	// 如果页面已经加载完成，立即执行
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", updateRunningTime);
+	} else {
+		updateRunningTime();
+	}
+
+	// 每分钟更新一次（确保跨天时能及时更新）
+	setInterval(updateRunningTime, 60000);
+</script>
+

@@ -1,0 +1,148 @@
+---
+interface Props {
+	class?: string;
+}
+
+const { class: className } = Astro.props;
+
+// 配置信息（你可以后续移到 config 文件）
+const profileConfig = {
+	name: "Lustre",
+	bio: "多媒体太空站站长",
+	// 头像配置：
+	// 1. 把头像图片放到 public 目录，比如 public/avatar.jpg
+	// 2. 把下面的路径改成你的头像文件名，例如 "/avatar.jpg"
+	// 3. 或者使用在线图片链接，例如 "https://example.com/avatar.jpg"
+	avatar: "/portrait.jpg", // 替换成你的头像路径
+	links: [
+		{ name: "GitHub", url: "https://github.com/theLustre", icon: "mdi:github" },
+	],
+};
+---
+<div class={`profile-card ${className || ""}`}>
+	<a href="/about" class="avatar-link">
+		<div class="avatar-overlay">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+				<path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/>
+			</svg>
+		</div>
+		<img src={profileConfig.avatar} alt="Profile" class="avatar" />
+	</a>
+	<div class="profile-info">
+		<div class="profile-name">{profileConfig.name}</div>
+		<div class="profile-divider"></div>
+		<div class="profile-bio">{profileConfig.bio}</div>
+		<div class="profile-links">
+			{profileConfig.links.map((link) => (
+				<a
+					href={link.url}
+					target="_blank"
+					rel="noreferrer"
+					class="profile-link"
+					aria-label={link.name}
+				>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+					</svg>
+				</a>
+			))}
+		</div>
+	</div>
+</div>
+
+<style>
+	.profile-card {
+		border-radius: 20px;
+		background: rgba(255, 255, 255, 0.04);
+		backdrop-filter: blur(10px);
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.avatar-link {
+		display: block;
+		position: relative;
+		width: 120px;
+		height: 120px;
+		margin: 0 auto 1rem;
+		border-radius: 16px;
+		overflow: hidden;
+		transition: transform 0.2s;
+	}
+
+	.avatar-link:hover {
+		transform: scale(0.95);
+	}
+
+	.avatar-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity 0.2s;
+		z-index: 10;
+		color: white;
+	}
+
+	.avatar-link:hover .avatar-overlay {
+		opacity: 1;
+	}
+
+	.avatar {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.profile-info {
+		text-align: center;
+	}
+
+	.profile-name {
+		font-size: 1.25rem;
+		font-weight: bold;
+		margin-bottom: 0.5rem;
+	}
+
+	.profile-divider {
+		width: 20px;
+		height: 2px;
+		background: #5b9aff;
+		margin: 0 auto 0.75rem;
+		border-radius: 1px;
+	}
+
+	.profile-bio {
+		color: rgba(249, 250, 251, 0.6);
+		margin-bottom: 1rem;
+		font-size: 0.9rem;
+	}
+
+	.profile-links {
+		display: flex;
+		gap: 0.5rem;
+		justify-content: center;
+	}
+
+	.profile-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.05);
+		color: #8dd0ff;
+		transition: all 0.2s;
+		text-decoration: none;
+	}
+
+	.profile-link:hover {
+		background: rgba(91, 154, 255, 0.2);
+		transform: scale(0.95);
+	}
+</style>
+

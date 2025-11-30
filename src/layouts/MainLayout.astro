@@ -1,0 +1,71 @@
+---
+import "../styles/global.css";
+
+interface Props {
+	title?: string;
+}
+
+const { title = "Lustre" } = Astro.props;
+---
+<html lang="zh-cn">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<link rel="stylesheet" href="/src/styles/global.css" />
+		<style>
+			.page-container {
+				max-width: 1400px;
+				margin: 0 auto;
+				padding: 2rem 1.5rem;
+			}
+
+			.main-grid {
+				display: grid;
+				grid-template-columns: 280px 1fr;
+				gap: 2rem;
+			}
+
+			.sidebar {
+				position: sticky;
+				top: 2rem;
+				height: fit-content;
+			}
+
+			.main-content {
+				min-width: 0;
+			}
+
+			@media (max-width: 1024px) {
+				.main-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.sidebar {
+					position: static;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.page-container {
+					padding: 1rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page-container">
+			<div class="main-grid">
+				<aside class="sidebar">
+					<slot name="sidebar" />
+				</aside>
+				<main class="main-content">
+					<slot />
+				</main>
+			</div>
+		</div>
+	</body>
+</html>
+
