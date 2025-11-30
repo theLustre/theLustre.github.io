@@ -4,6 +4,7 @@ import Profile from "../components/Profile.astro";
 import Statistics from "../components/Statistics.astro";
 import Tags from "../components/Tags.astro";
 import PostCard from "../components/PostCard.astro";
+import Spotify from "../components/Spotify.astro";
 
 const posts = await Astro.glob("./posts/*.md");
 
@@ -47,6 +48,7 @@ const latestPosts = posts
 			<MainContent title="Lustre · 主页">
 				<Fragment slot="sidebar">
 					<Profile />
+					<Spotify />
 					<Statistics />
 					<Tags />
 				</Fragment>
