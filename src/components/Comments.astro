@@ -1,0 +1,147 @@
+---
+// Giscus 评论系统配置
+// 需要先在 GitHub 仓库中启用 Discussions 功能
+// 然后访问 https://giscus.app 获取配置信息
+interface Props {
+	repo?: string; // 格式: "username/repo"
+	repoId?: string; // 从 giscus.app 获取
+	category?: string; // 从 giscus.app 获取
+	categoryId?: string; // 从 giscus.app 获取
+}
+
+const {
+	repo = "theLustre/theLustre.github.io",
+	repoId = "R_kgDOQeHXwg",
+	category = "General",
+	categoryId = "DIC_kwDOQeHXws4CzNNt",
+} = Astro.props;
+
+// 获取当前页面 URL
+const pageUrl = Astro.url.href;
+const pagePath = Astro.url.pathname;
+---
+
+<div class="comments-section">
+	<h2 class="comments-title">💬 评论</h2>
+	<p class="comments-note">
+		评论需要 GitHub 账号登录，您的用户名和邮箱将用于显示评论。
+	</p>
+	
+	{!repoId || !categoryId ? (
+		<div class="comments-config-notice">
+			<p><strong>⚠️ 评论系统未配置</strong></p>
+			<p>请按照以下步骤配置：</p>
+			<ol>
+				<li>在 GitHub 仓库中启用 Discussions</li>
+				<li>安装 Giscus 应用到 <strong>特定仓库</strong>（不是"所有仓库"）：<a href="https://github.com/apps/giscus" target="_blank">https://github.com/apps/giscus</a></li>
+				<li>访问 <a href="https://giscus.app" target="_blank">giscus.app</a>，<strong>重要</strong>：在 Repository 下拉菜单中必须选择 <code>theLustre/theLustre.github.io</code>（不要选择"All repositories"）</li>
+				<li>从生成的代码中复制 <code>data-repo-id</code> 和 <code>data-category-id</code> 的值</li>
+				<li>更新 <code>src/components/Comments.astro</code> 中的 <code>repoId</code> 和 <code>categoryId</code></li>
+			</ol>
+			<p><strong>如果 giscus.app 没有显示 ID：</strong></p>
+			<ul>
+				<li>确保选择了<strong>特定仓库</strong>，不是"所有仓库"</li>
+				<li>确保仓库已启用 Discussions 并创建了至少一个 category</li>
+				<li>查看详细说明：<code>docs/get-giscus-ids.md</code></li>
+			</ul>
+		</div>
+	) : null}
+	
+	{repoId && categoryId && (
+		<!-- Giscus 评论系统 -->
+		<div class="giscus-container">
+			<script
+				src="https://giscus.app/client.js"
+				data-repo={repo}
+				data-repo-id={repoId}
+				data-category={category}
+				data-category-id={categoryId}
+				data-mapping="pathname"
+				data-strict="0"
+				data-reactions-enabled="1"
+				data-emit-metadata="0"
+				data-input-position="bottom"
+				data-theme="dark"
+				data-lang="zh-CN"
+				crossorigin="anonymous"
+				async
+			></script>
+		</div>
+	)}
+</div>
+
+<style>
+	.comments-section {
+		margin-top: 3rem;
+		padding-top: 2rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.comments-title {
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin: 0 0 0.5rem 0;
+		color: #f9fafb;
+	}
+
+	.comments-note {
+		font-size: 0.875rem;
+		color: rgba(249, 250, 251, 0.6);
+		margin: 0 0 1.5rem 0;
+		line-height: 1.6;
+	}
+
+	.giscus-container {
+		margin-top: 1.5rem;
+	}
+
+	.comments-config-notice {
+		padding: 1.5rem;
+		background: rgba(255, 193, 7, 0.1);
+		border: 1px solid rgba(255, 193, 7, 0.3);
+		border-radius: 12px;
+		color: rgba(249, 250, 251, 0.9);
+	}
+
+	.comments-config-notice p {
+		margin: 0.5rem 0;
+		line-height: 1.6;
+	}
+
+	.comments-config-notice ol {
+		margin: 0.5rem 0;
+		padding-left: 1.5rem;
+	}
+
+	.comments-config-notice li {
+		margin: 0.5rem 0;
+	}
+
+	.comments-config-notice a {
+		color: #8dd0ff;
+		text-decoration: none;
+	}
+
+	.comments-config-notice a:hover {
+		color: #5b9aff;
+		text-decoration: underline;
+	}
+
+	.comments-config-notice code {
+		background: rgba(255, 255, 255, 0.1);
+		padding: 0.2rem 0.4rem;
+		border-radius: 4px;
+		font-size: 0.9em;
+	}
+
+	/* Giscus 主题适配 */
+	:global(.giscus) {
+		margin-top: 1rem;
+	}
+
+	/* 确保 Giscus 在暗色主题下正常显示 */
+	:global(.giscus-frame) {
+		color-scheme: dark;
+	}
+</style>
+

@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Comments from "../components/Comments.astro";
 
 // 从 frontmatter 获取标题（Astro Markdown 布局中 frontmatter 在 props 中）
 const frontmatter = Astro.props.frontmatter || {};
@@ -14,7 +15,7 @@ const title = frontmatter.title || "Lustre";
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} · Lustre</title>
 	</head>
-	<body>
+	<body style="background: radial-gradient(circle at top, #101b3a, #05060a 60%), #05060a; background-attachment: fixed;">
 		<div class="page-container-base">
 			<nav class="nav-global">
 				<a href="/">Home</a>
@@ -25,6 +26,7 @@ const title = frontmatter.title || "Lustre";
 			</nav>
 			<article class="card-base" style="padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.8;">
 				<slot />
+				<Comments />
 			</article>
 		</div>
 	</body>
