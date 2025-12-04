@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/Layout.astro
 title: "Machine Learning 101"
-pubDate: 2023-04-15
+pubDate: 2025-12-01
 description: "记录我入门机器学习的第一周，整理概念与代码片段。"
 author: "Lustre"
 tags: ["ml", "notes", "astro"]
