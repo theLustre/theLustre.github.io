@@ -12,7 +12,12 @@ const latestPosts = posts
 	.map((post) => ({
 		title: post.frontmatter?.title ?? "未命名文章",
 		description: post.frontmatter?.description ?? "",
-		date: post.frontmatter?.pubDate ? new Date(post.frontmatter.pubDate) : null,
+		// 使用 lastUpdated 作为展示时间，如果没有则回退到 pubDate（兼容旧文章）
+		date: post.frontmatter?.lastUpdated
+			? new Date(post.frontmatter.lastUpdated)
+			: post.frontmatter?.pubDate
+				? new Date(post.frontmatter.pubDate)
+				: null,
 		url: post.url || "#",
 		tags: (post.frontmatter?.tags as string[]) || [],
 	}))

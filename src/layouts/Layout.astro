@@ -2,9 +2,11 @@
 import "../styles/global.css";
 import Comments from "../components/Comments.astro";
 
-// 从 frontmatter 获取标题（Astro Markdown 布局中 frontmatter 在 props 中）
+// 从 frontmatter 获取标题、创建日期和最后更新时间（Astro Markdown 布局中 frontmatter 在 props 中）
 const frontmatter = Astro.props.frontmatter || {};
 const title = frontmatter.title || "Lustre";
+const createdDate = frontmatter.createdDate || frontmatter.created || null;
+const lastUpdated = frontmatter.lastUpdated || frontmatter.pubDate || null;
 ---
 <!doctype html>
 <html lang="zh-cn">
@@ -25,6 +27,33 @@ const title = frontmatter.title || "Lustre";
 				<a href="/Study/">Study</a>
 			</nav>
 			<article class="card-base" style="padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.8;">
+				<!-- 统一的文章标题和更新时间区域 -->
+				<header style="margin-bottom: 1.5rem;">
+					<h1 style="margin: 0 0 0.5rem 0; font-size: 1.8rem;">{title}</h1>
+					<div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.9rem; color: rgba(249, 250, 251, 0.6);">
+						{createdDate && (
+							<p style="margin: 0;">
+								创建日期：{" "}
+								{new Date(createdDate).toLocaleDateString("zh-CN", {
+									year: "numeric",
+									month: "2-digit",
+									day: "2-digit",
+								})}
+							</p>
+						)}
+						{lastUpdated && (
+							<p style="margin: 0;">
+								最后更新：{" "}
+								{new Date(lastUpdated).toLocaleDateString("zh-CN", {
+									year: "numeric",
+									month: "2-digit",
+									day: "2-digit",
+								})}
+							</p>
+						)}
+					</div>
+				</header>
+
 				<slot />
 				<Comments />
 			</article>

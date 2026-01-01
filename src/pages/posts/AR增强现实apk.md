@@ -1,7 +1,8 @@
 ---
 layout: ../../layouts/Layout.astro
 title: "AR 增强现实 APK 开发记录"
-pubDate: 2025-12-03
+createdDate: 2025-12-03
+lastUpdated: 2025-12-03
 description: "第一次使用 Android Studio 开发 AR APK 时遇到的代理与技术选型问题。"
 tags: ["android", "AR", "HMS", "开发记录"]
 ---

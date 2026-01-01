@@ -30,7 +30,8 @@ let lastUpdated = today.toLocaleDateString("zh-CN", {
 
 if (posts.length > 0) {
 	const dates = posts
-		.map((p) => p.frontmatter?.pubDate)
+		// 使用 lastUpdated 作为最后更新时间，如果没有则回退到 pubDate（兼容旧文章）
+		.map((p) => p.frontmatter?.lastUpdated ?? p.frontmatter?.pubDate)
 		.filter(Boolean)
 		.map((d) => new Date(d as string))
 		.filter((d) => !isNaN(d.getTime())); // 过滤无效日期
