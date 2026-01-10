@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/Layout.astro
+layout: ../../../layouts/Layout.astro
 title: "Machine Learning 101"
 createdDate: 2025-12-01
 lastUpdated: 2025-12-01
@@ -19,3 +19,4 @@ tags: ["ml", "notes", "astro"]
 - 验证集/测试集划分
 
 更多笔记将整理到 `docs/` 目录中。
+

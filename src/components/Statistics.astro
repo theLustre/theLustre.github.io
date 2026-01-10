@@ -2,7 +2,11 @@
 // 站点创建日期（你可以修改为你的站点实际创建日期）
 const SITE_START_DATE = new Date("2024-11-27"); // 修改为你的站点创建日期
 
-const posts = await Astro.glob("../pages/posts/*.md");
+// 分别匹配各个模块目录，避免 Windows 上中文路径的 glob 问题
+const posts1 = await Astro.glob("../pages/posts/专业技术/*.md");
+const posts2 = await Astro.glob("../pages/posts/日常记录/*.md");
+const posts3 = await Astro.glob("../pages/posts/思想笔记/*.md");
+const posts = [...posts1, ...posts2, ...posts3];
 
 const totalPosts = posts.length;
 

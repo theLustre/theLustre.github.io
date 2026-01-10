@@ -6,13 +6,14 @@ import Tags from "../components/Tags.astro";
 import PostCard from "../components/PostCard.astro";
 import Spotify from "../components/Spotify.astro";
 
-const posts = await Astro.glob("./posts/*.md");
+// 自动检测所有模块：获取 posts 目录下所有子目录中的文章
+const allPosts = await Astro.glob("./posts/**/*.md");
 
-const latestPosts = posts
-	.map((post) => ({
+// 处理文章数据的辅助函数
+function processPost(post: any, moduleName: string) {
+	return {
 		title: post.frontmatter?.title ?? "未命名文章",
 		description: post.frontmatter?.description ?? "",
-		// 使用 lastUpdated 作为展示时间，如果没有则回退到 pubDate（兼容旧文章）
 		date: post.frontmatter?.lastUpdated
 			? new Date(post.frontmatter.lastUpdated)
 			: post.frontmatter?.pubDate
@@ -20,9 +21,45 @@ const latestPosts = posts
 				: null,
 		url: post.url || "#",
 		tags: (post.frontmatter?.tags as string[]) || [],
+		image: post.frontmatter?.image?.url || post.frontmatter?.image || null,
+		imageAlt: post.frontmatter?.image?.alt || post.frontmatter?.imageAlt || null,
+		moduleName,
+	};
+}
+
+// 从 URL 提取模块名称（/posts/模块名/文件名）
+function extractModuleName(url: string): string {
+	// url 格式类似: /posts/专业技术/AR增强现实apk
+	const parts = url.split("/");
+	if (parts.length >= 3 && parts[1] === "posts") {
+		return parts[2]; // 返回模块名
+	}
+	return "未分类";
+}
+
+// 按模块自动分组文章
+const moduleMap = new Map<string, any[]>();
+
+allPosts.forEach((post) => {
+	const url = post.url || "";
+	const moduleName = extractModuleName(url);
+	const processedPost = processPost(post, moduleName);
+	
+	if (processedPost.url !== "#") {
+		if (!moduleMap.has(moduleName)) {
+			moduleMap.set(moduleName, []);
+		}
+		moduleMap.get(moduleName)!.push(processedPost);
+	}
+});
+
+// 转换为数组并按模块名排序，每个模块内的文章按日期排序
+const modules = Array.from(moduleMap.entries())
+	.map(([name, posts]) => ({
+		name,
+		posts: posts.sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0)),
 	}))
-	.filter((post) => post.url !== "#")
-	.sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
+	.sort((a, b) => a.name.localeCompare(b.name, "zh-CN")); // 按中文排序
 ---
 <html lang="zh-cn">
 	<head>
@@ -59,17 +96,32 @@ const latestPosts = posts
 				</Fragment>
 
 				<div>
-					<h1 style="font-size: 2rem; margin: 0 0 2rem 0;">最新文章</h1>
-					{latestPosts.length > 0 ? (
-						<div>
-							{latestPosts.map((post) => (
-								<PostCard
-									title={post.title}
-									{...(post.description ? { description: post.description } : {})}
-									{...(post.date ? { date: post.date } : {})}
-									url={post.url}
-									{...(post.tags.length > 0 ? { tags: post.tags } : {})}
-								/>
+					<h1 style="font-size: 2rem; margin: 0 0 2rem 0;">文章分类</h1>
+					{modules.length > 0 ? (
+						<div class="modules-container">
+							{modules.map((module, index) => (
+								<div class="module-section" data-module-index={index}>
+									<button class="module-title-button" data-module-index={index} type="button">
+										<span class="module-title-text">{module.name}</span>
+										<span class="module-count">({module.posts.length})</span>
+										<svg class="module-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M6 9l6 6 6-6"/>
+										</svg>
+									</button>
+									<div class="module-posts" data-module-index={index} style="display: none;">
+										{module.posts.map((post) => (
+											<PostCard
+												title={post.title}
+												{...(post.description ? { description: post.description } : {})}
+												{...(post.date ? { date: post.date } : {})}
+												url={post.url}
+												{...(post.tags.length > 0 ? { tags: post.tags } : {})}
+												{...(post.image ? { image: post.image } : {})}
+												{...(post.imageAlt ? { imageAlt: post.imageAlt } : {})}
+											/>
+										))}
+									</div>
+								</div>
 							))}
 						</div>
 					) : (
@@ -82,3 +134,112 @@ const latestPosts = posts
 		</div>
 	</body>
 </html>
+
+<style>
+	.modules-container {
+		display: flex;
+		flex-direction: column;
+		gap: 3rem;
+	}
+
+	.module-section {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.module-title-button {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		width: 100%;
+		padding: 1rem;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 12px;
+		cursor: pointer;
+		transition: all 0.2s;
+		text-align: left;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #8dd0ff;
+		font-family: inherit;
+	}
+
+	.module-title-button:hover {
+		background: rgba(91, 154, 255, 0.1);
+		border-color: rgba(91, 154, 255, 0.3);
+		transform: translateX(4px);
+	}
+
+	.module-title-text {
+		flex: 1;
+	}
+
+	.module-count {
+		font-size: 0.9rem;
+		font-weight: normal;
+		color: rgba(249, 250, 251, 0.6);
+	}
+
+	.module-arrow {
+		transition: transform 0.2s;
+		flex-shrink: 0;
+	}
+
+	.module-title-button[aria-expanded="true"] .module-arrow {
+		transform: rotate(180deg);
+	}
+
+	.module-posts {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding-left: 1rem;
+		margin-top: 0.5rem;
+		overflow: hidden;
+		transition: all 0.3s ease;
+	}
+
+	.module-posts[data-expanded="true"] {
+		display: flex;
+	}
+</style>
+
+<script>
+	// 折叠/展开功能
+	document.addEventListener("DOMContentLoaded", () => {
+		const buttons = document.querySelectorAll(".module-title-button");
+		
+		buttons.forEach((button) => {
+			const index = button.getAttribute("data-module-index");
+			const postsContainer = document.querySelector(
+				`.module-posts[data-module-index="${index}"]`
+			);
+			
+			if (!postsContainer) return;
+			
+			// 默认折叠
+			button.setAttribute("aria-expanded", "false");
+			postsContainer.setAttribute("data-expanded", "false");
+			postsContainer.style.display = "none";
+			
+			button.addEventListener("click", () => {
+				const isExpanded = button.getAttribute("aria-expanded") === "true";
+				
+				if (isExpanded) {
+					// 折叠
+					button.setAttribute("aria-expanded", "false");
+					postsContainer.setAttribute("data-expanded", "false");
+					postsContainer.style.display = "none";
+				} else {
+					// 展开
+					button.setAttribute("aria-expanded", "true");
+					postsContainer.setAttribute("data-expanded", "true");
+					postsContainer.style.display = "flex";
+				}
+			});
+		});
+	});
+</script>

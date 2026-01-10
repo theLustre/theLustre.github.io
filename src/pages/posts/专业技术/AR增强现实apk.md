@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/Layout.astro
+layout: ../../../layouts/Layout.astro
 title: "AR 增强现实 APK 开发记录"
 createdDate: 2025-12-03
 lastUpdated: 2025-12-03
@@ -18,3 +18,4 @@ tags: ["android", "AR", "HMS", "开发记录"]
 ## 技术选型调整：AR Core → HMS Core
 
 原本计划使用 AR Core，但我主要使用华为手机，而华为体系的 AR 能力是基于 **AR Engine / HMS Core**。因此项目中途需要调整技术选型，转而研究 HMS Core 提供的 AR 功能。虽然多了一些学习成本，但更贴合实际运行环境。
+

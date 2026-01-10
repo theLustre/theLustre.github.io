@@ -1,5 +1,9 @@
 ---
-const posts = await Astro.glob("../pages/posts/*.md");
+// 分别匹配各个模块目录，避免 Windows 上中文路径的 glob 问题
+const posts1 = await Astro.glob("../pages/posts/专业技术/*.md");
+const posts2 = await Astro.glob("../pages/posts/日常记录/*.md");
+const posts3 = await Astro.glob("../pages/posts/思想笔记/*.md");
+const posts = [...posts1, ...posts2, ...posts3];
 
 // 收集所有标签
 const tagMap = new Map<string, number>();

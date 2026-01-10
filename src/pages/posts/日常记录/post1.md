@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/Layout.astro
+layout: ../../../layouts/Layout.astro
 title: '我的第一篇博客文章'
 createdDate: 2023-10-01
 lastUpdated: 2023-10-01
@@ -28,3 +28,4 @@ tags: ["astro", "blogging", "learning in public"]
  ## 下一步计划
 
  我将完成 Astro 教程，然后继续编写更多内容。关注我以获取更多信息。
+
